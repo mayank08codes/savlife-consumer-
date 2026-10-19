@@ -100,12 +100,12 @@ export const LiveTrackingScreen: React.FC = () => {
     try {
       if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.clipboard) {
         await navigator.clipboard.writeText(
-          `SaveLife Live Ambulance Tracking: Unit ${driver.ambulanceNumber} is en route. ETA: ${etaMinutesRemaining} mins. Emergency PIN: ${otpCode}. Track: http://localhost:8081`
+          `SavLife Live Ambulance Tracking: Unit ${driver.ambulanceNumber} is en route. ETA: ${etaMinutesRemaining} mins. Emergency PIN: ${otpCode}. Track: http://localhost:8081`
         );
         Alert.alert('Tracking Link Copied', 'Live GPS ambulance tracking link copied to clipboard!');
       } else {
         await Share.share({
-          message: `SaveLife Live Ambulance Tracking: Unit ${driver.ambulanceNumber} is en route. ETA: ${etaMinutesRemaining} mins. Emergency PIN: ${otpCode}.`,
+          message: `SavLife Live Ambulance Tracking: Unit ${driver.ambulanceNumber} is en route. ETA: ${etaMinutesRemaining} mins. Emergency PIN: ${otpCode}.`,
         });
       }
     } catch (e) {}
@@ -420,7 +420,7 @@ export const LiveTrackingScreen: React.FC = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>SaveLife Emergency Safety Toolkit</Text>
+              <Text style={styles.modalTitle}>SavLife Emergency Safety Toolkit</Text>
               <TouchableOpacity onPress={() => setIsSafetyModalOpen(false)}>
                 <X size={20} color={COLORS.textPrimary} />
               </TouchableOpacity>

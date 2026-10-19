@@ -19,7 +19,7 @@ export const TripActions: React.FC<TripActionsProps> = ({
   hospitalName,
 }) => {
   const handleShare = () => {
-    const text = `🚨 Emergency SaveLife Live Tracking: Ambulance ${vehicleNo} (Driver: ${driverName}) is currently en route to ${hospitalName || 'the Hospital'}. Track live dispatch status here: https://savelife.app/track/${bookingId}`;
+    const text = `🚨 Emergency SavLife Live Tracking: Ambulance ${vehicleNo} (Driver: ${driverName}) is currently en route to ${hospitalName || 'the Hospital'}. Track live dispatch status here: https://savelife.app/track/${bookingId}`;
     const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`;
 
     Linking.canOpenURL(whatsappUrl)

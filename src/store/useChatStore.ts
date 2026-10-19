@@ -15,7 +15,7 @@ const INITIAL_MESSAGES: AiChatMessage[] = [
   {
     id: 'ai-welcome',
     sender: 'assistant',
-    text: "Hi, I'm **SaveLife AI**. Tell me what's happening or what symptoms you're experiencing, and I'll provide immediate first-aid triage and find emergency care nearby.",
+    text: "Hi, I'm **SavLife AI**. Tell me what's happening or what symptoms you're experiencing, and I'll provide immediate first-aid triage and find emergency care nearby.",
     timestamp: 'Just now',
   },
 ];

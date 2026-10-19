@@ -1,4 +1,4 @@
-// 🏠 SaveLife Home Screen - Hyper-Modern Emergency Dispatch & Hospital Discovery
+// 🏠 SavLife Home Screen - Hyper-Modern Emergency Dispatch & Hospital Discovery
 // Sector 128 Noida Live GPS, Siren Audio, 1-Tap SOS, Hospital Carousel, Blinkit Staff & Facilities
 
 import React, { useState, useEffect } from 'react';
@@ -132,13 +132,13 @@ export function HomeScreen() {
           {/* Left spacer for visual center balance */}
           <View style={styles.headerBalanceSpacer} />
 
-          {/* Centered SaveLife Brand Box */}
+          {/* Centered SavLife Brand Box */}
           <View style={styles.brandFloatingBox}>
             <View style={styles.brandIconBox}>
               <HeartPulse size={16} color="#FFFFFF" />
             </View>
             <View>
-              <Text style={styles.brandTitleText}>SaveLife</Text>
+              <Text style={styles.brandTitleText}>SavLife</Text>
               <Text style={styles.brandCaptionText}>EMERGENCY CARE</Text>
             </View>
           </View>
@@ -414,7 +414,7 @@ export function HomeScreen() {
 
         {/* 🛡️ Safety & Trust Verification */}
         <View style={styles.trustSection}>
-          <Text style={styles.trustSectionTitle}>SaveLife Medical Trust & Standards</Text>
+          <Text style={styles.trustSectionTitle}>SavLife Medical Trust & Standards</Text>
           <View style={styles.trustItems}>
             <TrustItem icon={<MapPin size={18} color={COLORS.primary} />} text="Live GPS Tracked" />
             <TrustItem icon={<CheckCircle size={18} color={COLORS.primary} />} text="NABH Certified" />

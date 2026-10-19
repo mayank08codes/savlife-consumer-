@@ -189,7 +189,7 @@ export const AiAssistantScreen: React.FC = () => {
 
           <View style={styles.headerTitleCol}>
             <View style={styles.titleBadgeRow}>
-              <Text style={styles.headerTitle}>SaveLife Medical AI</Text>
+              <Text style={styles.headerTitle}>SavLife Medical AI</Text>
               <View style={styles.liveAiBadge}>
                 <Sparkles size={9} color="#FFFFFF" />
                 <Text style={styles.liveAiBadgeText}>NVIDIA NIM</Text>

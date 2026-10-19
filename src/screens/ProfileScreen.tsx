@@ -67,7 +67,7 @@ export const ProfileScreen: React.FC = () => {
             <Text style={styles.userPhone}>+91 98765 43210</Text>
             <View style={styles.medicalIdPill}>
               <Shield size={12} color={COLORS.primary} />
-              <Text style={styles.medicalIdText}>SaveLife Medical ID: SL-99201</Text>
+              <Text style={styles.medicalIdText}>SavLife Medical ID: SL-99201</Text>
             </View>
           </View>
         </View>

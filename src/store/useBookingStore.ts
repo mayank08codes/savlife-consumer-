@@ -2,6 +2,8 @@
 // Yeh store poori booking ki state handle karta hai - screen, hospital, ambulance, fare, OTP sab kuch
 
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Hospital, getNearbyHospitalsMock } from '../services/mockDataService';
 import { FareCalculationResult, computeFare } from '../services/fareCalculator';
 import { RouteInfo, fetchDirectionsRoute } from '../services/googleMapsService';
@@ -43,6 +45,7 @@ export interface BookingRecord {
   status: BookingStatus;
   driverName?: string;
   ambulanceNumber?: string;
+  feedback?: { hospitalRating: number; ambulanceRating: number; comment: string; submittedAt: string };
 }
 
 interface BookingState {
@@ -90,9 +93,10 @@ interface BookingState {
   loadHospitalRoute: () => Promise<void>;
   generateOtp: () => void;
   setOtpVerified: (verified: boolean) => void;
+  submitFeedback: (bookingId: string, feedback: { hospitalRating: number; ambulanceRating: number; comment: string }) => void;
 }
 
-export const useBookingStore = create<BookingState>((set, get) => ({
+export const useBookingStore = create<BookingState>()(persist((set, get) => ({
   // 🏠 Default Screen - App kholte hi home screen dikhega
   currentScreen: 'home',
 
@@ -279,4 +283,20 @@ export const useBookingStore = create<BookingState>((set, get) => ({
 
   // ✅ OTP Verify - Driver ne sahi OTP daala ya nahi
   setOtpVerified: (verified) => set({ otpVerified: verified }),
+
+  // ⭐ Patient feedback - completed booking ke baad hospital aur ambulance review save karo
+  submitFeedback: (bookingId, feedback) => set((state) => ({
+    bookingHistory: state.bookingHistory.map((booking) => booking.id === bookingId
+      ? { ...booking, feedback: { ...feedback, submittedAt: new Date().toISOString() } }
+      : booking),
+  })),
+}), {
+  name: 'savlife-booking-state',
+  storage: createJSONStorage(() => AsyncStorage),
+  partialize: (state) => ({
+    bookingHistory: state.bookingHistory,
+    selectedHospital: state.selectedHospital,
+    selectedAmbulanceType: state.selectedAmbulanceType,
+    fareCalculation: state.fareCalculation,
+  }),
 }));

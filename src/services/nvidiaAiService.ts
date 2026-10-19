@@ -14,7 +14,7 @@ export interface AiChatMessage {
 }
 
 const EMERGENCY_SYSTEM_PROMPT = `
-You are SaveLife Emergency Medical AI, an expert, calm, and rapid emergency triage assistant.
+You are SavLife Emergency Medical AI, an expert, calm, and rapid emergency triage assistant.
 Your job is to:
 1. Quickly assess the user's medical emergency.
 2. Provide immediate, step-by-step life-saving first aid instructions (e.g. CPR, direct pressure on bleeding, recovery position).
@@ -106,7 +106,7 @@ function evaluateLocalEmergencyTriage(userMessage: string) {
   }
 
   return {
-    text: `🚑 **SaveLife Emergency Response**\n\nI've assessed your request. Please ensure the patient is in a safe environment and resting comfortably.\n\nI have fetched the top-rated emergency trauma centers near your current live GPS coordinates below. You can book an ambulance directly with one tap.`,
+    text: `🚑 **SavLife Emergency Response**\n\nI've assessed your request. Please ensure the patient is in a safe environment and resting comfortably.\n\nI have fetched the top-rated emergency trauma centers near your current live GPS coordinates below. You can book an ambulance directly with one tap.`,
     ambulanceType: 'bls' as const,
     urgency: 'urgent' as const,
   };

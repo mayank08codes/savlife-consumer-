@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "SaveLife",
+    "name": "SavLife",
     "slug": "savelife",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,7 +16,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.savelife.emergency",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "SaveLife needs your location to dispatch ambulances to your exact position."
+        "NSLocationWhenInUseUsageDescription": "SavLife needs your location to dispatch ambulances to your exact position."
       }
     },
     "android": {
