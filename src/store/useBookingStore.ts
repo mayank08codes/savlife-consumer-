@@ -39,6 +39,7 @@ export type BookingStatus =
 export interface BookingRecord {
   id: string;
   timestamp: string;
+  completedAt?: string;
   hospital: Hospital;
   ambulanceType: 'bls' | 'als'; // 🚑 Sirf BLS ya ALS - Bike hata diya
   fare: FareCalculationResult;
@@ -256,6 +257,7 @@ export const useBookingStore = create<BookingState>()(persist((set, get) => ({
       const record: BookingRecord = {
         id: activeBookingId || `BK-${Date.now()}`,
         timestamp: 'Just now',
+        completedAt: new Date().toISOString(),
         hospital: selectedHospital,
         ambulanceType: selectedAmbulanceType,
         fare: fareCalculation,

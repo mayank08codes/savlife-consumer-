@@ -220,12 +220,24 @@ const feedbackStyles = StyleSheet.create({
 
 export default function App() {
   const { currentScreen, setCurrentScreen, bookingHistory, submitFeedback } = useBookingStore();
+<<<<<<< HEAD
   const [splashDone, setSplashDone] = React.useState(false);
   const [feedbackVisible, setFeedbackVisible] = React.useState(false);
   const [feedbackDismissed, setFeedbackDismissed] = React.useState(false);
   const [manualFeedbackBookingId, setManualFeedbackBookingId] = React.useState<string | null>(null);
 
   const pendingFeedback = bookingHistory.find((booking) => booking.status === 'completed' && !booking.feedback);
+=======
+  const sessionStartedAt = React.useRef(Date.now());
+  const [feedbackVisible, setFeedbackVisible] = React.useState(false);
+  const [feedbackDismissed, setFeedbackDismissed] = React.useState(false);
+  const pendingFeedback = bookingHistory.find((booking) =>
+    booking.status === 'completed' &&
+    Boolean(booking.completedAt) &&
+    Date.parse(booking.completedAt as string) < sessionStartedAt.current &&
+    !booking.feedback
+  );
+>>>>>>> 7440b7d (Show feedback after completed journey reopen)
 
   // Auto-show feedback prompt on app reopen (after splash) if there's a pending booking
   React.useEffect(() => {
