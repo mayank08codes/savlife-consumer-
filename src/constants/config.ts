@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 const extra = Constants.expoConfig?.extra || {};
 
 export const ENV = {
-  GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY || extra.googleMapsApiKey || '<<PUT_YOUR_GOOGLE_MAPS_KEY_HERE>>',
+  GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY || extra.googleMapsApiKey || '',
   NVIDIA_NIM_API_KEY: process.env.NVIDIA_NIM_API_KEY || extra.nvidiaNimApiKey || '<<PUT_YOUR_NVIDIA_API_KEY_HERE>>',
   
   // NVIDIA NIM Chat Completions Endpoint
@@ -16,6 +16,7 @@ export const hasValidGoogleMapsKey = () => {
   return (
     ENV.GOOGLE_MAPS_API_KEY &&
     !ENV.GOOGLE_MAPS_API_KEY.includes('<<PUT_') &&
+    ENV.GOOGLE_MAPS_API_KEY !== 'GOOGLE_MAPS_API_KEY' &&
     ENV.GOOGLE_MAPS_API_KEY.length > 10
   );
 };
