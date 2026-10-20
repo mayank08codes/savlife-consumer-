@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "SavLife",
-    "slug": "savelife",
+    "slug": "savlife",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,9 +14,9 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.savelife.emergency",
+      "bundleIdentifier": "com.savlife.emergency",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "SaveLife needs your location to dispatch ambulances to your exact position."
+        "NSLocationWhenInUseUsageDescription": "SavLife needs your location to dispatch ambulances to your exact position."
       }
     },
     "android": {
@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0E9F6E"
       },
-      "package": "com.savelife.emergency",
+      "package": "com.savlife.emergency",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"

@@ -7,7 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { Truck, Clock, CheckCircle2, ChevronRight, ShieldAlert, Route, AlertCircle } from 'lucide-react-native';
+import { Truck, CheckCircle2, Route, Star, MessageSquare } from 'lucide-react-native';
 import { COLORS } from '../constants/colors';
 import { useBookingStore } from '../store/useBookingStore';
 import { AMBULANCE_TYPES } from '../constants/ambulanceTypes';
@@ -29,13 +29,22 @@ export const BookingHistoryScreen: React.FC = () => {
     bookingStatus === 'patient_picked_up' ||
     bookingStatus === 'en_route_hospital';
 
+  /**
+   * Opens the global FeedbackPrompt in App.tsx for the given booking.
+   * App.tsx registers __savlife_openFeedback on globalThis so any screen can trigger it.
+   */
+  const handleOpenFeedback = (bookingId: string) => {
+    const openFn = (globalThis as any).__savlife_openFeedback;
+    if (typeof openFn === 'function') openFn(bookingId);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>My Ambulance Bookings</Text>
-          <Text style={styles.headerSubtitle}>Live Tracking & Emergency Medical History</Text>
+          <Text style={styles.headerSubtitle}>Live Tracking &amp; Emergency Medical History</Text>
         </View>
 
         <ScrollView
@@ -94,6 +103,8 @@ export const BookingHistoryScreen: React.FC = () => {
 
           {bookingHistory.map((item) => {
             const config = AMBULANCE_TYPES[item.ambulanceType] || AMBULANCE_TYPES.bls;
+            const hasFeedback = !!item.feedback;
+            const needsFeedback = item.status === 'completed' && !hasFeedback;
 
             return (
               <View key={item.id} style={styles.historyCard}>
@@ -127,6 +138,31 @@ export const BookingHistoryScreen: React.FC = () => {
                     EMT: {item.driverName} • {item.ambulanceNumber}
                   </Text>
                 </View>
+
+                {/* ─── Feedback Section ───────────────────────────────── */}
+                {hasFeedback ? (
+                  // Already rated — show submitted stars summary
+                  <View style={styles.feedbackDoneRow}>
+                    <View style={styles.feedbackDoneBadge}>
+                      <Star size={12} color="#F59E0B" fill="#F59E0B" />
+                      <Text style={styles.feedbackDoneText}>
+                        Hospital {item.feedback!.hospitalRating}★ · Ambulance {item.feedback!.ambulanceRating}★
+                      </Text>
+                    </View>
+                    <Text style={styles.feedbackDoneLabel}>Feedback submitted</Text>
+                  </View>
+                ) : needsFeedback ? (
+                  // Not yet rated — show "Give Feedback" button
+                  <TouchableOpacity
+                    style={styles.feedbackBtn}
+                    activeOpacity={0.85}
+                    onPress={() => handleOpenFeedback(item.id)}
+                  >
+                    <MessageSquare size={14} color="#0E9F6E" />
+                    <Text style={styles.feedbackBtnText}>Rate this trip</Text>
+                  </TouchableOpacity>
+                ) : null}
+                {/* ──────────────────────────────────────────────────────── */}
               </View>
             );
           })}
@@ -343,5 +379,53 @@ const styles = StyleSheet.create({
   driverText: {
     fontSize: 11,
     color: COLORS.textMuted,
+  },
+
+  // ── Feedback styles ──────────────────────────────────────────
+  feedbackBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 12,
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: '#A7F3D0',
+    backgroundColor: '#ECFDF5',
+    alignSelf: 'flex-start',
+  },
+  feedbackBtnText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#047857',
+  },
+  feedbackDoneRow: {
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.divider,
+  },
+  feedbackDoneBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  feedbackDoneText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#92400E',
+  },
+  feedbackDoneLabel: {
+    fontSize: 11,
+    color: COLORS.textMuted,
+    fontWeight: '600',
   },
 });

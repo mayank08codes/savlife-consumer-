@@ -1,11 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, Platform, SafeAreaView, Modal, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, View, Platform, SafeAreaView, Modal, Text, TextInput, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useBookingStore } from './src/store/useBookingStore';
 import { COLORS } from './src/constants/colors';
-import { Star, X, MessageSquare, CheckCircle } from 'lucide-react-native';
+import { Star, X, MessageSquare, CheckCircle, HeartPulse } from 'lucide-react-native';
 
 // Screens
 import { HomeScreen } from './src/screens/HomeScreen';
@@ -22,6 +22,121 @@ import { DestinationSearchScreen } from './src/screens/DestinationSearchScreen';
 import { BottomNavBar } from './src/components/common/BottomNavBar';
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 🚀 SavLife Splash / Loading Screen
+// Shows on first mount for ~2 seconds with the correct "SavLife" branding
+// ─────────────────────────────────────────────────────────────────────────────
+function SplashScreen({ onDone }: { onDone: () => void }) {
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const scaleAnim = React.useRef(new Animated.Value(0.85)).current;
+
+  React.useEffect(() => {
+    // Fade + scale in
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+      Animated.spring(scaleAnim, { toValue: 1, friction: 6, useNativeDriver: true }),
+    ]).start();
+
+    // After 2.2 s, fade out and call onDone
+    const timer = setTimeout(() => {
+      Animated.timing(fadeAnim, { toValue: 0, duration: 400, useNativeDriver: true }).start(() => onDone());
+    }, 2200);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <View style={splashStyles.container}>
+      <Animated.View style={[splashStyles.content, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+        {/* Brand Icon */}
+        <View style={splashStyles.iconRing}>
+          <HeartPulse size={38} color="#FFFFFF" />
+        </View>
+
+        {/* Brand Name — correct spelling: SavLife */}
+        <Text style={splashStyles.brandName}>SavLife</Text>
+        <Text style={splashStyles.tagline}>EMERGENCY CARE · 24 / 7</Text>
+
+        {/* Pulse dots loader */}
+        <View style={splashStyles.dotsRow}>
+          {[0, 1, 2].map((i) => (
+            <PulseDot key={i} delay={i * 180} />
+          ))}
+        </View>
+      </Animated.View>
+    </View>
+  );
+}
+
+function PulseDot({ delay }: { delay: number }) {
+  const anim = React.useRef(new Animated.Value(0.3)).current;
+  React.useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.delay(delay),
+        Animated.timing(anim, { toValue: 1, duration: 500, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 0.3, duration: 500, useNativeDriver: true }),
+      ])
+    ).start();
+  }, []);
+  return <Animated.View style={[splashStyles.dot, { opacity: anim }]} />;
+}
+
+const splashStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0D2137',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
+    alignItems: 'center',
+  },
+  iconRing: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: '#EF4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.55,
+    shadowRadius: 18,
+    elevation: 14,
+    marginBottom: 22,
+  },
+  brandName: {
+    fontSize: 42,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: -1,
+  },
+  tagline: {
+    marginTop: 6,
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#0E9F6E',
+    letterSpacing: 2,
+  },
+  dotsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 36,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#0E9F6E',
+  },
+});
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ⭐ Feedback Prompt Modal
+// Shown on app reopen when a completed booking has no feedback yet
+// ─────────────────────────────────────────────────────────────────────────────
 function FeedbackPrompt({
   visible,
   booking,
@@ -105,13 +220,61 @@ const feedbackStyles = StyleSheet.create({
 
 export default function App() {
   const { currentScreen, setCurrentScreen, bookingHistory, submitFeedback } = useBookingStore();
+  const [splashDone, setSplashDone] = React.useState(false);
   const [feedbackVisible, setFeedbackVisible] = React.useState(false);
   const [feedbackDismissed, setFeedbackDismissed] = React.useState(false);
+  const [manualFeedbackBookingId, setManualFeedbackBookingId] = React.useState<string | null>(null);
+
   const pendingFeedback = bookingHistory.find((booking) => booking.status === 'completed' && !booking.feedback);
 
+  // Auto-show feedback prompt on app reopen (after splash) if there's a pending booking
   React.useEffect(() => {
-    if (pendingFeedback && !feedbackDismissed) setFeedbackVisible(true);
-  }, [pendingFeedback?.id, feedbackDismissed]);
+    if (splashDone && pendingFeedback && !feedbackDismissed) setFeedbackVisible(true);
+  }, [splashDone, pendingFeedback?.id, feedbackDismissed]);
+
+  // The booking to show in the feedback modal — either auto-triggered or manually opened from history
+  const activeFeedbackBooking = manualFeedbackBookingId
+    ? bookingHistory.find((b) => b.id === manualFeedbackBookingId) ?? pendingFeedback
+    : pendingFeedback;
+
+  const handleFeedbackSubmit = (feedback: { hospitalRating: number; ambulanceRating: number; comment: string }) => {
+    if (activeFeedbackBooking) {
+      submitFeedback(activeFeedbackBooking.id, feedback);
+    }
+    setFeedbackVisible(false);
+    setFeedbackDismissed(true);
+    setManualFeedbackBookingId(null);
+  };
+
+  const handleFeedbackLater = () => {
+    setFeedbackVisible(false);
+    setFeedbackDismissed(true);
+    setManualFeedbackBookingId(null);
+  };
+
+  // Expose a global callback so BookingHistoryScreen can open the feedback modal for any booking
+  // We use the store's currentScreen as a proxy to detect navigation, but we need to pass
+  // openFeedbackForBooking down. The cleanest approach: expose via a module-level ref.
+  React.useEffect(() => {
+    (globalThis as any).__savlife_openFeedback = (bookingId: string) => {
+      setManualFeedbackBookingId(bookingId);
+      setFeedbackVisible(true);
+    };
+    return () => { delete (globalThis as any).__savlife_openFeedback; };
+  }, []);
+
+  if (!splashDone) {
+    return (
+      <SafeAreaProvider>
+        <View style={styles.outerContainer}>
+          <View style={[styles.appContainer, { justifyContent: 'center' }]}>
+            <StatusBar style="light" backgroundColor="transparent" translucent />
+            <SplashScreen onDone={() => setSplashDone(true)} />
+          </View>
+        </View>
+      </SafeAreaProvider>
+    );
+  }
 
   const renderCurrentScreen = () => {
     switch (currentScreen) {
@@ -164,12 +327,12 @@ export default function App() {
             />
           )}
 
-          {pendingFeedback && (
+          {activeFeedbackBooking && (
             <FeedbackPrompt
               visible={feedbackVisible}
-              booking={pendingFeedback}
-              onLater={() => { setFeedbackVisible(false); setFeedbackDismissed(true); }}
-              onSubmit={(feedback) => { submitFeedback(pendingFeedback.id, feedback); setFeedbackVisible(false); setFeedbackDismissed(true); }}
+              booking={activeFeedbackBooking}
+              onLater={handleFeedbackLater}
+              onSubmit={handleFeedbackSubmit}
             />
           )}
         </View>
